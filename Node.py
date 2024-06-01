@@ -3,7 +3,6 @@ from enum import Enum
 from queue import Queue
 from random import Random
 
-import LAYER as LAYER
 
 from constant import SEED
 
