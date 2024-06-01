@@ -70,8 +70,23 @@ class EdgeNode(Node):
                             arrival_task.submission_time = arrival_task.arrival_time
                             with self.process_queue_lock:
                                 self.processing_queue.append(arrival_task)
+                        elif constant.SIMULATION_TYPE == "Fog Only":
+                            from Link import Link
+                            link, fog_node = Link.find_edge_fog_node(self)
+                            link.simulate_send_message(arrival_task)
+                            with fog_node.process_queue_lock:
+                                fog_node.processing_queue.append(arrival_task)
+                            # print(arrival_task)
+                        elif constant.SIMULATION_TYPE == "Cloud Only":
+                            from Link import Link
+                            link, fog_node = Link.find_edge_fog_node(self)
+                            link.simulate_send_message(arrival_task)
+                            link2, cloud_node = Link.find_fog_to_cloud_link(fog_node)
+                            link2.simulate_send_message(arrival_task)
+                            with cloud_node.process_queue_lock:
+                                cloud_node.processing_queue.append(arrival_task)
                         else:
-                            pass
+                            print("You died")
                     # TODO
             time.sleep(0.001)
 
@@ -92,10 +107,10 @@ class EdgeNode(Node):
                     execution_time += task.execution_time
                     task.status = "done"
                     task.finish_time = execution_time
-                    print("----------------------")
-                    print(f'Processing task {task.task_id} on node {self.node_id} with deadline {task.deadline}')
-                    print(task)
-                    print(f'Task {task.task_id} processed.')
+                    # print("----------------------")
+                    # print(f'Processing task {task.task_id} on node {self.node_id} with deadline {task.deadline}')
+                    # print(task)
+                    # print(f'Task {task.task_id} processed.')
                     if execution_time > self.simulated_time:
                         self._increase_timer(task.finish_time - self.simulated_time)
             time.sleep(0.01)

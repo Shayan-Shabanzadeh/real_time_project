@@ -3,7 +3,10 @@ from enum import Enum
 from random import Random
 
 import constant
+from EdgeNode import EdgeNode
+from FogNode import FogNode
 from Node import Node, LAYER
+from Task import Task
 from constant import SEED
 
 
@@ -89,6 +92,43 @@ class Link:
                             Link.LINKS.append(link)
                             Link.connected_pairs.add((node1, node2))
                             link_id += 1
+
+    @staticmethod
+    def find_link(node1, node2):
+        for link in Link.LINKS:
+            if (link.node1 == node1 and link.node2 == node2) or (link.node1 == node2 and link.node2 == node1):
+                return link
+        return None
+
+    # assume ever edge node is only connected to one fog node
+    @staticmethod
+    def find_edge_fog_node(node1: EdgeNode):
+        for link in Link.LINKS:
+            if link.node1 is node1:
+                if link.node2.layer is LAYER.FOG:
+                    return link, link.node2
+            elif link.node2 is node1:
+                if link.node1.layer is LAYER.FOG:
+                    return link, link.node1
+            else:
+                continue
+
+    @staticmethod
+    def find_fog_to_cloud_link(fog_node: FogNode):
+        for link in Link.LINKS:
+            if link.node1 is fog_node:
+                if link.node2.layer is LAYER.CLOUD:
+                    return link, link.node2
+            elif link.node2 is fog_node:
+                if link.node1.layer is LAYER.CLOUD:
+                    return link, link.node1
+            else:
+                continue
+
+    def simulate_send_message(self, task: Task):
+        with self.lock:
+            interarrival_time = task.task_size / self.link_bandwidth
+            task.arrival_to_layer += interarrival_time
 
     def __str__(self):
         return (f"Link(ID: {self.link_id}, "

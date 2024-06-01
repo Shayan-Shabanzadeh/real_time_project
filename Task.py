@@ -21,6 +21,7 @@ class Task:
         self.execution_time = None
         self.finish_time = -1
         self.result_data = None
+        self.arrival_to_layer = self.arrival_time
         self.node = None
 
     def __str__(self):
@@ -38,5 +39,6 @@ class Task:
             f"Execution Time: {self.execution_time}s\n"
             f"Finish Time: {self.finish_time}s\n"
             f"Start Execute Time: {self.execute_start_time}s\n"
-            f"Result Data: {self.result_data}"
+            f"Result Data: {self.result_data}\n"
+            f"Arrival To Layer: {self.arrival_to_layer}"
         )
