@@ -3,7 +3,6 @@ from enum import Enum
 from queue import Queue
 from random import Random
 
-
 from constant import SEED
 
 
@@ -16,11 +15,11 @@ class LAYER(Enum):
 class Node:
     rnd = Random()
     rnd.seed(SEED)
-    FOG_NODES = []
+    NODES = []
 
-    def __init__(self, node_id, layer: LAYER, cpu_frequency: float = None, x_coordinate: float = None,
+    def __init__(self, layer: LAYER, cpu_frequency: float = None, x_coordinate: float = None,
                  y_coordinate: float = None):
-        self.node_id = node_id
+        self.node_id = len(Node.NODES) + 1
         self.layer = layer
         self.processing_queue = Queue()
         self.message_queue = Queue()
@@ -34,4 +33,3 @@ class Node:
     @staticmethod
     def generate_node_cpu_frequency(MIN_CPU_FREQUENCY, MAX_CPU_FREQUENCY):
         return Node.rnd.uniform(MIN_CPU_FREQUENCY, MAX_CPU_FREQUENCY)
-

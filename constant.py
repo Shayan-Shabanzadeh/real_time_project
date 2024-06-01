@@ -21,5 +21,18 @@ FOG_MIN_LINK_BANDWIDTH = 50
 CLOUD_MAX_LINK_BANDWIDTH = 50
 CLOUD_MIN_LINK_BANDWIDTH = 3
 
-
 PROBILITY_CONNECT_NODES = 0.3
+
+city_weight = 1000  # 1000m
+city_height = 1000 # 1000m
+min_distance_between_cloud_nodes = 100  # 100m
+
+max_distance_between_fog_to_cloud = 100
+min_distance_between_fog_to_cloud = 40
+
+
+max_distance_between_fog_to_fog = 100
+min_distance_between_fog_to_fog = 40
+
+max_distance_between_edge_to_fog = 50
+min_distance_between_edge_to_fog = 10
