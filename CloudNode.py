@@ -17,7 +17,7 @@ class CloudNode(Node):
         return (f"CloudNode(ID: {self.node_id}, "
                 f"CPU Frequency: {self.cpu_frequency} GHz, "
                 f"Coordinates: ({self.x_coordinate}, {self.y_coordinate}), "
-                f"Processing Queue Size: {self.processing_queue.qsize()}, "
+                f"Processing Queue Size: {len(self.processing_queue)}, "
                 f"Message Queue Size: {self.message_queue.qsize()}), "
                 f"x_coordinate: {self.x_coordinate}, "
                 f"y_coordinate: {self.y_coordinate}")

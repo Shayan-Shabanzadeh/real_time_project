@@ -1,7 +1,10 @@
 import math
+import threading
 from random import Random
+
 import networkx as nx
 from matplotlib import pyplot as plt
+
 import constant
 from CloudNode import CloudNode
 from EdgeNode import EdgeNode
@@ -156,10 +159,23 @@ class NetworkLayer:
         nx.draw(G, pos, with_labels=True, labels=labels, node_size=700, node_color=node_colors, font_size=8,
                 font_color="black", font_weight="bold", edge_color="gray", width=2)
 
-
         plt.show()
 
-# To execute the visualization
-if __name__ == "__main__":
-    network_layer = NetworkLayer()
-    network_layer.visualize_topology()
+    def start_simulation(self):
+        threads = []
+        for node in self.cloud_nodes:
+            thread = threading.Thread(target=node.start)
+            thread.start()
+            threads.append(thread)
+        for node in self.fog_nodes:
+            thread = threading.Thread(target=node.start)
+            thread.start()
+            threads.append(thread)
+        for node in self.edge_nodes:
+            thread = threading.Thread(target=node.start)
+            thread.start()
+            threads.append(thread)
+        for thread in threads:
+            thread.join()
+
+
