@@ -10,7 +10,6 @@ from CloudNode import CloudNode
 from EdgeNode import EdgeNode
 from FogNode import FogNode
 from Link import Link, LINK_TYPE
-from Node import LAYER
 
 # Constants
 city_width = constant.city_weight  # 1000m
@@ -149,11 +148,22 @@ class NetworkLayer:
             if node.node_id not in pos:
                 print(f"Node {node.node_id} has no position assigned.")
 
-        # Define node colors based on layer
-        node_colors = ["orange" if node.layer is LAYER.CLOUD else
-                       "skyblue" if node.layer is LAYER.FOG else
-                       "green" if node.layer is LAYER.EDGE else
-                       "yellow" for node in self.nodes]
+        # Define node colors based on layer with additional debug prints
+        node_colors = []
+        for node in self.nodes:
+            if isinstance(node, CloudNode):
+                node_colors.append("orange")
+            elif isinstance(node, FogNode):
+                node_colors.append("skyblue")
+            elif isinstance(node, EdgeNode):
+                node_colors.append("green")
+            else:
+                node_colors.append("yellow")
+            print(f"Node {node.node_id}: Layer = {node.layer}, Color = {node_colors[-1]}")
+
+        # Debugging: Check node colors in the graph
+        for node_id, color in zip([node.node_id for node in self.nodes], node_colors):
+            print(f"Graph Node {node_id}: Color = {color}")
 
         labels = {node.node_id: f"{node.layer.name.capitalize()} {node.node_id}" for node in self.nodes}
         nx.draw(G, pos, with_labels=True, labels=labels, node_size=700, node_color=node_colors, font_size=8,
@@ -177,5 +187,3 @@ class NetworkLayer:
             threads.append(thread)
         for thread in threads:
             thread.join()
-
-

@@ -6,4 +6,5 @@ if __name__ == '__main__':
         print(node)
     network_layer.start_simulation()
 
+
     # network_layer.visualize_topology()
