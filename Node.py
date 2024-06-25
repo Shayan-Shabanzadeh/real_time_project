@@ -23,6 +23,7 @@ class Node:
         self.layer = layer
         self.processing_queue = []
         self.arrival_queue = Queue()
+        self.arrival_list = []
         self.simulated_time = 0
         self.timer_lock = threading.Lock()
         self.message_queue = Queue()

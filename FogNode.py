@@ -47,31 +47,33 @@ class FogNode(Node):
         process_thread.join()
 
     def _process_queue_thread(self):
-        while self.simulated_time <= constant.SIMULATION_TIME:
+        execution_time = 0
+        empty_queue_time = 0
+        while execution_time <= constant.SIMULATION_TIME:
             with self.process_queue_lock:
                 if len(self.processing_queue) != 0:
+                    empty_queue_time = 0  # Reset the timer when a task is found
                     task = self.get_task_with_min_deadline()
-                    self.simulated_time = task.arrival_to_layer
-                    task.submission_time = task.arrival_to_layer
-                    task.execute_start_time = self.simulated_time
+                    if task.arrival_to_layer > execution_time:
+                        execution_time = task.arrival_to_layer
+                    task.execute_start_time = execution_time
                     processing_time = task.processing_requirements / self.cpu_frequency
-
                     task.execution_time = processing_time
-                    self.simulated_time += task.execution_time
+                    task.finish_time = execution_time + processing_time
+                    if task.finish_time > task.deadline:
+                        task.status = "failed"
+                        continue
+                    execution_time += task.execution_time
                     task.status = "done"
-                    task.finish_time = self.simulated_time
-                    # print("----------------------")
-                    # print(f'Processing task {task.task_id} on node {self.node_id} with deadline {task.deadline}')
-                    # print(task)
-                    # print(f'Task {task.task_id} processed.')
+                    task.finish_time = execution_time
+                    print("----------------------")
+                    print(f'Processing task {task.task_id} on node {self.node_id} with deadline {task.deadline}')
+                    print(task)
+                    print(f'Task {task.task_id} processed.')
 
-            time.sleep(0.01)
+                else:
+                    empty_queue_time += 0.1
+                    time.sleep(0.1)
+                if empty_queue_time >= 1:  # Check if the queue has been empty for 3 seconds
+                    break  # Exit the loop
 
-    def _increase_timer(self, time_to_simulate):
-        if self.simulated_time <= constant.SIMULATION_TIME:
-            with self.timer_lock:
-                self.simulated_time += time_to_simulate
-            # time.sleep(time_to_simulate)
-        else:
-            print("simulation is over.")
-            SystemExit()

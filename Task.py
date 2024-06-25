@@ -12,6 +12,7 @@ class Task:
         self.submission_time = submission_time
         self.arrival_time = arrival_time
         self.execute_start_time = -1
+        self.has_offloaded = False
         # network communication requirement is in MByte
         self.network_communication_requirements = network_communication_requirements
         self.deadline = deadline

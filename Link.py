@@ -39,7 +39,6 @@ class Link:
             min_bandwidth = constant.EDGE_MIN_LINK_BANDWIDTH
         elif self.link_type is LINK_TYPE.EDGE_FOG:
             max_bandwidth = constant.EDGE_MAX_LINK_BANDWIDTH
-            min_bandwidth = constant.EDGE_MIN_LINK_BANDWIDTH
         elif self.link_type is LINK_TYPE.FOG_CLOUD:
             max_bandwidth = constant.CLOUD_MAX_LINK_BANDWIDTH
             min_bandwidth = constant.CLOUD_MIN_LINK_BANDWIDTH

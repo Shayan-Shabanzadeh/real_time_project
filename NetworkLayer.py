@@ -133,57 +133,72 @@ class NetworkLayer:
                 fog_node.x_coordinate = x
                 fog_node.y_coordinate = y
 
-    def create_topology_graph(self):
+    @staticmethod
+    def create_topology_graph():
         G = nx.Graph()
-        for link in self.links:
+        for link in Link.LINKS:
             G.add_edge(link.node1.node_id, link.node2.node_id, bandwidth=link.link_bandwidth, link_object=link)
         return G
 
-    def visualize_topology(self):
-        G = self.create_topology_graph()
-        pos = {node.node_id: (node.x_coordinate, node.y_coordinate) for node in self.nodes}
+    @staticmethod
+    def find_min_path(start_node, end_node):
+        G = NetworkLayer.create_topology_graph()
+        try:
+            shortest_path = nx.shortest_path(G, source=start_node.node_id, target=end_node.node_id, weight='bandwidth')
+            path_links = []
+            for i in range(len(shortest_path) - 1):
+                node1 = shortest_path[i]
+                node2 = shortest_path[i + 1]
+                link = G[node1][node2]['link_object']
+                path_links.append(link)
+            return path_links
+        except nx.NetworkXNoPath:
+            return None
 
-        # Ensure all nodes have been assigned a position
-        for node in self.nodes:
-            if node.node_id not in pos:
-                print(f"Node {node.node_id} has no position assigned.")
+    @staticmethod
+    def visualize_topology():
+        G = NetworkLayer.create_topology_graph()
+        from Node import Node
+        pos = {node.node_id: (node.x_coordinate, node.y_coordinate) for node in Node.NODES}
 
         # Define node colors based on layer with additional debug prints
         node_colors = []
-        for node in self.nodes:
+        for node in Node.NODES:
             if isinstance(node, CloudNode):
-                node_colors.append("orange")
+                node_colors.append("skyblue")
             elif isinstance(node, FogNode):
                 node_colors.append("skyblue")
             elif isinstance(node, EdgeNode):
-                node_colors.append("green")
+                node_colors.append("skyblue")
             else:
                 node_colors.append("yellow")
-            print(f"Node {node.node_id}: Layer = {node.layer}, Color = {node_colors[-1]}")
 
-        # Debugging: Check node colors in the graph
-        for node_id, color in zip([node.node_id for node in self.nodes], node_colors):
-            print(f"Graph Node {node_id}: Color = {color}")
-
-        labels = {node.node_id: f"{node.layer.name.capitalize()} {node.node_id}" for node in self.nodes}
+        labels = {node.node_id: f"{node.layer.name.capitalize()} {node.node_id}" for node in Node.NODES}
         nx.draw(G, pos, with_labels=True, labels=labels, node_size=700, node_color=node_colors, font_size=8,
                 font_color="black", font_weight="bold", edge_color="gray", width=2)
 
         plt.show()
 
     def start_simulation(self):
-        threads = []
-        for node in self.cloud_nodes:
-            thread = threading.Thread(target=node.start)
-            thread.start()
-            threads.append(thread)
-        for node in self.fog_nodes:
-            thread = threading.Thread(target=node.start)
-            thread.start()
-            threads.append(thread)
+        edge_threads = []
+        fog_threads = []
+        cloud_thread = []
         for node in self.edge_nodes:
             thread = threading.Thread(target=node.start)
             thread.start()
-            threads.append(thread)
-        for thread in threads:
+            edge_threads.append(thread)
+        for thread in edge_threads:
+            thread.join()
+
+        for node in self.fog_nodes:
+            thread = threading.Thread(target=node.start)
+            thread.start()
+            fog_threads.append(thread)
+        for thread in fog_threads:
+            thread.join()
+        for node in self.cloud_nodes:
+            thread = threading.Thread(target=node.start)
+            thread.start()
+            cloud_thread.append(thread)
+        for thread in cloud_thread:
             thread.join()
